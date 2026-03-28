@@ -7,6 +7,8 @@
  */
 import type { StageInterface, Payload, TrafficLogEntry } from '../../index';
 import { StageException } from '../../../core/pipeline/stage-interface';
+import { VisitorService } from '../../service/visitor-service';
+import { RawClickService } from '../../service/raw-click-service';
 
 /**
  * Update Raw Click Stage
@@ -36,47 +38,17 @@ export class UpdateRawClickStage implements StageInterface {
       rawClick.set('ts_id', trafficSourceId);
     }
 
-    // Generate visitor code
-    const visitorCode = this._generateVisitorCode(rawClick);
+    // Generate visitor code using VisitorService
+    const visitorService = VisitorService.instance();
+    const visitorCode = visitorService.generateCode(rawClick);
     rawClick.set('visitor_code', visitorCode);
 
-    // Generate sub ID
-    const subId = this._generateSubId(visitorCode);
+    // Generate sub ID using RawClickService
+    const rawClickService = RawClickService.instance();
+    const subId = rawClickService.generateSubId(visitorCode);
     rawClick.setSubId(subId);
 
     payload.setRawClick(rawClick);
     return payload;
-  }
-
-  /**
-   * Generate visitor code
-   */
-  private _generateVisitorCode(click: { getIp: () => string; getUserAgent: () => string }): string {
-    // Simple hash of IP + UserAgent for visitor identification
-    const ip = click.getIp();
-    const ua = click.getUserAgent();
-    const hash = this._simpleHash(`${ip}:${ua}`);
-    return hash.toString(36);
-  }
-
-  /**
-   * Generate sub ID from visitor code
-   */
-  private _generateSubId(visitorCode: string): string {
-    const timestamp = Date.now().toString(36);
-    return `${visitorCode}${timestamp}`.substring(0, 16);
-  }
-
-  /**
-   * Simple hash function
-   */
-  private _simpleHash(str: string): number {
-    let hash = 0;
-    for (let i = 0; i < str.length; i++) {
-      const char = str.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
-      hash = hash & hash; // Convert to 32bit integer
-    }
-    return Math.abs(hash);
   }
 }

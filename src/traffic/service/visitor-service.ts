@@ -14,14 +14,12 @@ export class VisitorService extends AbstractService {
    * Uses murmurhash-like algorithm for consistent visitor identification
    */
   public generateCode(rawClick: RawClick): string {
-    const srcString = [
-      rawClick.getIp() ?? '',
-      rawClick.getUserAgent() ?? '',
-      rawClick.getConnectionType() ?? '',
-      rawClick.getCountry() ?? '',
-      rawClick.getCity() ?? '',
-      rawClick.getDeviceModel() ?? ''
-    ].join('');
+    const srcString = (rawClick.get<string>('ip_string') || rawClick.getIp() || '') +
+      (rawClick.getUserAgent() || '') +
+      (rawClick.getConnectionType() || '') +
+      (rawClick.getCountry() || '') +
+      (rawClick.getCity() || '') +
+      (rawClick.getDeviceModel() || '');
 
     return this.murmurhash3(srcString);
   }

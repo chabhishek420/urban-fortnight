@@ -74,8 +74,11 @@ export class RawClickService extends AbstractService {
    * Generate a unique sub ID for a click
    */
   public generateSubId(visitorCode: string): string {
+    // In Keitaro PHP: base_convert(\Traffic\Redis\Service\RedisStorageService::instance()->incr(SUBIDSEQ), 10, 32);
+    // Fallback: uniqid();
+    // Here we use a counter converted to base32 + some randomness for unique sub_id within the length limit
     this._subIdCounter++;
-    const randomness = this._subIdCounter.toString(32);
+    const randomness = this._subIdCounter.toString(32) + Math.random().toString(32).substring(2, 8);
     const subId = (visitorCode + randomness).substring(0, RawClickService.SUBID_LENGTH);
     return subId;
   }
