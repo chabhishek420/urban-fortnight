@@ -326,30 +326,34 @@ export class BuildRawClickStage implements StageInterface {
 
   /**
    * Find sub IDs
+   * @artifact ARTIFACT-012: Optimized to avoid 60 unnecessary getParam calls
    */
-  private _findSubIds(request: { getParam: (n: string) => string | undefined }, click: RawClick): void {
-    for (let i = 1; i <= 30; i++) {
-      let subId = request.getParam(`sub_id_${i}`);
-      if (subId !== undefined) {
-        click.setSubIdN(i, decodeURIComponent(subId).trim());
-      }
-
-      // Also check subidN format
-      subId = request.getParam(`subid${i}`);
-      if (subId !== undefined) {
-        click.setSubIdN(i, decodeURIComponent(subId).trim());
+  private _findSubIds(request: { getQueryParams: () => Record<string, string> }, click: RawClick): void {
+    const params = request.getQueryParams();
+    for (const [key, value] of Object.entries(params)) {
+      if (key.startsWith('sub_id_') || key.startsWith('subid')) {
+        const nStr = key.replace('sub_id_', '').replace('subid', '');
+        const n = parseInt(nStr, 10);
+        if (n >= 1 && n <= 30) {
+          click.setSubIdN(n, decodeURIComponent(value).trim());
+        }
       }
     }
   }
 
   /**
    * Find extra params
+   * @artifact ARTIFACT-012: Optimized to avoid 20 unnecessary getParam calls
    */
-  private _findExtraParams(request: { getParam: (n: string) => string | undefined }, click: RawClick): void {
-    for (let i = 1; i <= 20; i++) {
-      const extraParam = request.getParam(`extra_param_${i}`);
-      if (extraParam) {
-        click.setExtraParamN(i, decodeURIComponent(extraParam).trim());
+  private _findExtraParams(request: { getQueryParams: () => Record<string, string> }, click: RawClick): void {
+    const params = request.getQueryParams();
+    for (const [key, value] of Object.entries(params)) {
+      if (key.startsWith('extra_param_')) {
+        const nStr = key.replace('extra_param_', '');
+        const n = parseInt(nStr, 10);
+        if (n >= 1 && n <= 20) {
+          click.setExtraParamN(n, decodeURIComponent(value).trim());
+        }
       }
     }
   }

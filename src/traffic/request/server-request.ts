@@ -9,6 +9,7 @@ export class ServerRequest {
   private _method: string;
   private _uri: URL;
   private _headers: Map<string, string>;
+  private _lowercasedHeaders: Map<string, string> = new Map();
   private _queryParams: Record<string, string>;
   private _body: unknown;
   private _cookies: Record<string, string>;
@@ -30,6 +31,9 @@ export class ServerRequest {
     this._method = options.method ?? 'GET';
     this._uri = options.uri ?? new URL('http://localhost/');
     this._headers = new Map(Object.entries(options.headers ?? {}));
+    for (const [key, value] of this._headers) {
+      this._lowercasedHeaders.set(key.toLowerCase(), value);
+    }
     this._queryParams = options.queryParams ?? {};
     this._body = options.body;
     this._cookies = options.cookies ?? {};
@@ -88,27 +92,18 @@ export class ServerRequest {
 
   /**
    * Get a header value
+   * @artifact ARTIFACT-011: Optimized for O(1) case-insensitive lookup
    */
   getHeader(name: string): string | undefined {
-    // Case-insensitive lookup
-    for (const [key, value] of this._headers) {
-      if (key.toLowerCase() === name.toLowerCase()) {
-        return value;
-      }
-    }
-    return undefined;
+    return this._lowercasedHeaders.get(name.toLowerCase());
   }
 
   /**
    * Check if header exists
+   * @artifact ARTIFACT-011: Optimized for O(1) case-insensitive lookup
    */
   hasHeader(name: string): boolean {
-    for (const key of this._headers.keys()) {
-      if (key.toLowerCase() === name.toLowerCase()) {
-        return true;
-      }
-    }
-    return false;
+    return this._lowercasedHeaders.has(name.toLowerCase());
   }
 
   /**
