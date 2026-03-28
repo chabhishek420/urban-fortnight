@@ -98,12 +98,18 @@ export class BuildRawClickStage implements StageInterface {
     }
 
     // Set IP if not set
-    const ip = click.get<string>('ip');
+    const ip = click.get<string>('ip_string');
     if (!ip || ip === '0.0.0.0') {
       const clientIp = request.getClientIp();
-      click.set('ip', clientIp);
       click.set('ip_string', clientIp);
-      logger.add(`Client IP: ${clientIp}`);
+      click.set('ip', clientIp); // Set for compatibility, though PHP uses numeric here
+
+      const xffHeader = request.getHeader('X-Forwarded-For');
+      const cfcipHeader = request.getHeader('CF-Connecting-IP');
+      const xripHeader = request.getHeader('X-Real-IP');
+
+      const logMessage = `Possible IP headers: X-Forwarded-For: ${xffHeader || 'Empty'}; CF-Connecting-IP: ${cfcipHeader || 'Empty'}; X-Real-IP: ${xripHeader || 'Empty'}`;
+      logger.add(logMessage);
     }
   }
 

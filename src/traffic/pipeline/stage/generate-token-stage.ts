@@ -88,11 +88,12 @@ export class GenerateTokenStage implements StageInterface {
    */
   private _storeRawClick(click: { getSubId: () => string; getData: () => Record<string, unknown> }): string {
     // Generate a unique token
+    // Keitaro PHP: UUID_PREFIX . $subId . "_" . uniqid($subId, true);
     const subId = click.getSubId();
-    const timestamp = Date.now().toString(36);
-    const random = Math.random().toString(36).substring(2, 10);
+    const unique = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    const token = `uuid_${subId}_${unique}`;
 
-    return `${subId}_${timestamp}_${random}`;
+    return token;
   }
 
   /**

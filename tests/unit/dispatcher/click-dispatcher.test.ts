@@ -101,6 +101,7 @@ function createMockRequest(): any {
     getHeader: () => undefined,
     getMethod: () => 'GET',
     getIp: () => '127.0.0.1',
+    getClientIp: () => '127.0.0.1',
     getUserAgent: () => 'Test Agent'
   };
 }

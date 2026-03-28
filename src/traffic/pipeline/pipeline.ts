@@ -10,6 +10,7 @@
 import type { StageInterface, Payload, TrafficLogEntry } from '../index';
 import { StageException } from '../../core/pipeline/stage-interface';
 import { RawClick } from '../model/raw-click';
+import { getFirstLevelStages, getSecondLevelStages } from './stages';
 
 /**
  * Maximum recursion limit for campaign forwarding
@@ -122,8 +123,6 @@ export class Pipeline implements PipelineInterface {
    * Override this method to customize stage list
    */
   protected _getFirstLevelStages(): StageInterface[] {
-    // Import stages from factory
-    const { getFirstLevelStages } = require('./stages');
     return getFirstLevelStages();
   }
 
@@ -132,7 +131,6 @@ export class Pipeline implements PipelineInterface {
    * Override this method to customize stage list
    */
   protected _getSecondLevelStages(): StageInterface[] {
-    const { getSecondLevelStages } = require('./stages');
     return getSecondLevelStages();
   }
 
