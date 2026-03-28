@@ -1,0 +1,447 @@
+// Keitaro Ad-Tracker Database Schema
+// SQLite version for development
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// Core Tables
+// ============================================
+
+model Campaign {
+  id                     Int       @id @default(autoincrement())
+  alias                  String?
+  name                   String?
+  type                   String    @default("position")
+  uniquenessMethod       String    @default("ip_ua") @map("uniqueness_method")
+  cookiesTtl             Int       @default(24) @map("cookies_ttl")
+  actionType             String?   @map("action_type")
+  actionPayload          String?   @map("action_payload")
+  actionForBots          String    @default("404") @map("action_for_bots")
+  botRedirectUrl         String?   @map("bot_redirect_url")
+  botText                String?   @map("bot_text")
+  actionTrackingDisabled Boolean   @default(false) @map("action_tracking_disabled")
+  position               Int?
+  state                  String    @default("active")
+  updatedAt              DateTime? @map("updated_at")
+  mode                   String?
+  costType               String?   @default("CPV") @map("cost_type")
+  costValue              Float     @default(0) @map("cost_value")
+  costCurrency           String?   @map("cost_currency")
+  groupId                Int?      @map("group_id")
+  bindVisitors           String?   @map("bind_visitors")
+  trafficSourceId        Int?      @map("traffic_source_id")
+  token                  String?   @unique
+  costAuto               Boolean   @default(false) @map("cost_auto")
+  domainId               Int?      @map("domain_id")
+  notes                  String?
+  parameters             String?
+  uniquenessUseCookies   Int?      @default(1) @map("uniqueness_use_cookies")
+  trafficLoss            Float     @default(0) @map("traffic_loss")
+
+  @@index([alias])
+  @@index([state])
+  @@index([groupId])
+  @@index([trafficSourceId])
+  @@map("campaigns")
+}
+
+model Stream {
+  id             Int       @id @default(autoincrement())
+  type           String    @default("regular")
+  name           String?
+  campaignId     Int?      @map("campaign_id")
+  groupId        Int?      @map("group_id")
+  position       Int       @default(1)
+  actionOptions  String?   @map("action_options")
+  comments       String?
+  state          String    @default("active")
+  updatedAt      DateTime? @map("updated_at")
+  actionType     String?   @map("action_type")
+  actionPayload  String?   @map("action_payload")
+  schema         String?
+  collectClicks  Boolean   @default(true) @map("collect_clicks")
+  filterOr       Boolean   @default(false) @map("filter_or")
+  weight         Int       @default(0)
+  chance         Int       @default(0)
+
+  @@index([position])
+  @@index([state])
+  @@index([campaignId])
+  @@map("streams")
+}
+
+model Offer {
+  id                   Int       @id @default(autoincrement())
+  name                 String
+  groupId              Int?      @map("group_id")
+  actionPayload        String?   @map("action_payload")
+  affiliateNetworkId   Int?      @map("affiliate_network_id")
+  payoutValue          Float     @default(0) @map("payout_value")
+  payoutCurrency       String?   @map("payout_currency")
+  payoutType           String?   @map("payout_type")
+  state                String?
+  createdAt            DateTime  @default(now()) @map("created_at")
+  updatedAt            DateTime  @default(now()) @map("updated_at")
+  payoutAuto           Boolean   @default(false) @map("payout_auto")
+  payoutUpsell         Boolean   @default(false) @map("payout_upsell")
+  country              String?
+  notes                String?
+  actionOptions        String?   @map("action_options")
+  actionType           String?   @map("action_type")
+  offerType            String    @default("external") @map("offer_type")
+  url                  String?
+  conversionCapEnabled Boolean   @default(false) @map("conversion_cap_enabled")
+  dailyCap             Int       @default(0) @map("daily_cap")
+  conversionTimezone   String    @default("UTC") @map("conversion_timezone")
+  alternativeOfferId   Int?      @map("alternative_offer_id")
+
+  @@index([state])
+  @@map("offers")
+}
+
+model Landing {
+  id             Int       @id @default(autoincrement())
+  name           String
+  actionPayload  String?   @map("action_payload")
+  groupId        Int?      @map("group_id")
+  offerCount     Int       @default(1) @map("offer_count")
+  state          String?
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @default(now()) @map("updated_at")
+  landingType    String    @default("external") @map("landing_type")
+  notes          String?
+  actionOptions  String?   @map("action_options")
+  actionType     String?   @map("action_type")
+  url            String?
+
+  @@index([state])
+  @@map("landings")
+}
+
+model AffiliateNetwork {
+  id             Int       @id @default(autoincrement())
+  name           String
+  postbackUrl    String?   @map("postback_url")
+  offerParam     String?   @map("offer_param")
+  state          String?
+  templateName   String?   @map("template_name")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @default(now()) @map("updated_at")
+  notes          String?
+  pullApiOptions String?   @map("pull_api_options")
+
+  @@map("affiliate_networks")
+}
+
+model TrafficSource {
+  id                Int       @id @default(autoincrement())
+  name              String
+  postbackUrl       String?   @map("postback_url")
+  postbackStatuses  String?   @default("[\"sale\",\"lead\",\"rejected\",\"rebill\"]") @map("postback_statuses")
+  templateName      String?   @map("template_name")
+  acceptParameters  Boolean   @default(true) @map("accept_parameters")
+  parameters        String?
+  state             String?
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @default(now()) @map("updated_at")
+  notes             String?
+  trafficLoss       Float     @default(0) @map("traffic_loss")
+
+  @@map("traffic_sources")
+}
+
+model Domain {
+  id                Int       @id @default(autoincrement())
+  name              String    @unique
+  isSsl             Boolean   @default(false) @map("is_ssl")
+  networkStatus     String?   @map("network_status")
+  defaultCampaignId Int?      @map("default_campaign_id")
+  state             String?
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @default(now()) @map("updated_at")
+  wildcard          Boolean   @default(false)
+  catchNotFound     Boolean   @default(true) @map("catch_not_found")
+  notes             String?
+  errorDescription  String?   @map("error_description")
+  sslStatus         String?   @map("ssl_status")
+  redirect          String    @default("not")
+  sslData           String?   @map("ssl_data")
+  isRobotsAllowed   Boolean   @default(true) @map("is_robots_allowed")
+  nextCheckAt       DateTime? @map("next_check_at")
+  sslRedirect       Boolean   @default(false) @map("ssl_redirect")
+  allowIndexing     Boolean   @default(true) @map("allow_indexing")
+  checkRetries      Int       @default(0) @map("check_retries")
+
+  @@map("domains")
+}
+
+// ============================================
+// User & Authentication
+// ============================================
+
+model User {
+  id            Int     @id @default(autoincrement())
+  type          String  @default("USER")
+  login         String
+  password      String?
+  passwordHash  String? @map("password_hash")
+  rules         String?
+  permissions   String?
+
+  @@index([login])
+  @@index([type])
+  @@map("users")
+}
+
+model UserPasswordHash {
+  id            Int      @id @default(autoincrement())
+  userId        Int      @map("user_id")
+  passwordHash  String?  @map("password_hash")
+  expiresAt     DateTime @map("expires_at")
+
+  @@index([userId])
+  @@map("user_password_hashes")
+}
+
+model UserPreference {
+  id         Int     @id @default(autoincrement())
+  userId     Int     @map("user_id")
+  prefName   String  @map("pref_name")
+  prefValue  String? @map("pref_value")
+
+  @@unique([userId, prefName])
+  @@map("user_preferences")
+}
+
+model Acl {
+  id          Int     @id @default(autoincrement())
+  userId      Int     @map("user_id")
+  entityType  String  @map("entity_type")
+  accessType  String  @map("access_type")
+  groups      String?
+  entities    String?
+
+  @@index([userId])
+  @@index([entityType])
+  @@index([accessType])
+  @@map("acl")
+}
+
+// ============================================
+// Click Tracking
+// ============================================
+
+model Click {
+  clickId                Int       @id @default(autoincrement()) @map("click_id")
+  visitorId              Int       @map("visitor_id")
+  subId                  String    @unique @map("sub_id")
+  tsId                   Int?      @map("ts_id")
+  landingId              Int?      @map("landing_id")
+  landingClicked         Boolean   @default(false) @map("landing_clicked")
+  landingClickedDatetime DateTime? @map("landing_clicked_datetime")
+  offerId                Int?      @map("offer_id")
+  affiliateNetworkId     Int?      @map("affiliate_network_id")
+  datetime               DateTime
+  campaignId             Int       @map("campaign_id")
+  parentCampaignId       Int?      @map("parent_campaign_id")
+  streamId               Int?      @map("stream_id")
+  isUniqueStream         Boolean   @default(false) @map("is_unique_stream")
+  isUniqueCampaign       Boolean   @default(false) @map("is_unique_campaign")
+  isUniqueGlobal         Boolean   @default(false) @map("is_unique_global")
+  isBot                  Boolean   @default(false) @map("is_bot")
+  isUsingProxy           Boolean   @default(false) @map("is_using_proxy")
+  isEmptyReferrer        Boolean   @default(false) @map("is_empty_referrer")
+  sourceId               Int       @map("source_id")
+  referrerId             Int       @map("referrer_id")
+  searchEngineId         Int?      @map("search_engine_id")
+  keywordId              Int?      @map("keyword_id")
+  extraParam1            String?   @map("extra_param_1")
+  extraParam2            String?   @map("extra_param_2")
+  extraParam3            String?   @map("extra_param_3")
+  extraParam4            String?   @map("extra_param_4")
+  extraParam5            String?   @map("extra_param_5")
+  leadRevenue            Float     @default(0) @map("lead_revenue")
+  rejectedRevenue        Float     @default(0) @map("rejected_revenue")
+  saleRevenue            Float     @default(0) @map("sale_revenue")
+  cost                   Float     @default(0)
+  isLead                 Boolean   @default(false) @map("is_lead")
+  isSale                 Boolean   @default(false) @map("is_sale")
+  isRejected             Boolean   @default(false) @map("is_rejected")
+  rebills                Int       @default(0)
+  goal1                  Boolean   @default(false) @map("goal_1")
+  goal1Datetime          DateTime? @map("goal_1_datetime")
+  goal2                  Boolean   @default(false) @map("goal_2")
+  goal2Datetime          DateTime? @map("goal_2_datetime")
+  goal3                  Boolean   @default(false) @map("goal_3")
+  goal3Datetime          DateTime? @map("goal_3_datetime")
+  goal4                  Boolean   @default(false) @map("goal_4")
+  goal4Datetime          DateTime? @map("goal_4_datetime")
+
+  @@index([datetime])
+  @@index([landingId])
+  @@index([offerId])
+  @@index([streamId])
+  @@index([campaignId, datetime])
+  @@index([streamId, datetime])
+  @@map("clicks")
+}
+
+// ============================================
+// Conversions
+// ============================================
+
+model Conversion {
+  conversionId       Int       @id @default(autoincrement()) @map("conversion_id")
+  visitorId          Int?      @map("visitor_id")
+  campaignId         Int?      @map("campaign_id")
+  streamId           Int?      @map("stream_id")
+  tsId               Int?      @map("ts_id")
+  landingId          Int?      @map("landing_id")
+  offerId            Int?      @map("offer_id")
+  affiliateNetworkId Int?      @map("affiliate_network_id")
+  subId              String    @map("sub_id")
+  clickId            Int?      @map("click_id")
+  tid                String?
+  clickDatetime      DateTime  @default(now()) @map("click_datetime")
+  postbackDatetime   DateTime  @default(now()) @map("postback_datetime")
+  status             String?
+  previousStatus     String?   @map("previous_status")
+  originalStatus     String?   @map("original_status")
+  sourceId           Int?      @map("source_id")
+  referrerId         Int?      @map("referrer_id")
+  searchEngineId     Int?      @map("search_engine_id")
+  keywordId          Int?      @map("keyword_id")
+  screenId           Int?      @map("screen_id")
+  revenue            Float     @default(0)
+  cost               Float     @default(0)
+  params             String?
+  isProcessed        Boolean   @default(false) @map("is_processed")
+
+  @@index([campaignId])
+  @@index([affiliateNetworkId])
+  @@index([subId, tid])
+  @@map("conversions_2")
+}
+
+// ============================================
+// Stream Filters & Associations
+// ============================================
+
+model StreamFilter {
+  id        Int     @id @default(autoincrement())
+  streamId  Int     @map("stream_id")
+  name      String
+  mode      String
+  payload   String?
+
+  @@index([streamId])
+  @@map("stream_filters")
+}
+
+model StreamLandingAssociation {
+  id         Int      @id @default(autoincrement())
+  streamId   Int      @map("stream_id")
+  landingId  Int      @map("landing_id")
+  state      String
+  share      Int
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @default(now()) @map("updated_at")
+
+  @@unique([streamId, landingId])
+  @@map("stream_landing_associations")
+}
+
+model StreamOfferAssociation {
+  id         Int      @id @default(autoincrement())
+  streamId   Int      @map("stream_id")
+  offerId    Int      @map("offer_id")
+  state      String
+  share      Int
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @default(now()) @map("updated_at")
+
+  @@unique([streamId, offerId])
+  @@map("stream_offer_associations")
+}
+
+// ============================================
+// Settings & Configuration
+// ============================================
+
+model Setting {
+  key    String  @id
+  value  String?
+
+  @@map("settings")
+}
+
+// ============================================
+// Visitors & Sessions
+// ============================================
+
+model Visitor {
+  id               Int     @id @default(autoincrement())
+  visitorCode      String  @unique @map("visitor_code")
+  ipId             Int     @map("ip_id")
+  userAgentId      Int     @map("user_agent_id")
+  countryId        Int?    @map("country_id")
+  regionId         Int?    @map("region_id")
+  cityId           Int?    @map("city_id")
+  deviceTypeId     Int?    @map("device_type_id")
+  deviceModelId    Int?    @map("device_model_id")
+  screenId         Int?    @map("screen_id")
+  languageId       Int?    @map("language_id")
+  browserId        Int?    @map("browser_id")
+  browserVersionId Int?    @map("browser_version_id")
+  osId             Int?    @map("os_id")
+  osVersionId      Int?    @map("os_version_id")
+  connectionTypeId Int?    @map("connection_type_id")
+  operatorId       Int?    @map("operator_id")
+  ispId            Int?    @map("isp_id")
+
+  @@index([ipId])
+  @@index([countryId])
+  @@index([deviceTypeId])
+  @@map("visitors")
+}
+
+model Session {
+  id           Int      @id @default(autoincrement())
+  visitorCode  String   @map("visitor_code")
+  expiresAt    DateTime @map("expires_at")
+  payload      String
+
+  @@unique([visitorCode])
+  @@index([expiresAt])
+  @@map("sessions")
+}
+
+// ============================================
+// System Tables
+// ============================================
+
+model CronStatus {
+  id          Int      @id @default(autoincrement())
+  taskName    String   @unique @map("task_name")
+  executedAt  DateTime @map("executed_at")
+
+  @@map("cron_status")
+}
+
+model DelayedTask {
+  id            Int       @id @default(autoincrement())
+  data          Bytes
+  datetime      DateTime?
+  status        String
+  errorMessage  String?   @map("error_message")
+
+  @@index([status])
+  @@map("delayed_tasks")
+}

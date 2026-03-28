@@ -1,0 +1,1 @@
+{"version":3,"file":"frame-action.d.ts","sourceRoot":"","sources":["../../../src/traffic/actions/frame-action.ts"],"names":[],"mappings":"AAAA;;;;;;GAMG;AAEH,OAAO,EAAE,cAAc,EAAE,UAAU,EAAE,WAAW,EAAE,MAAM,mBAAmB,CAAC;AAE5E,qBAAa,WAAY,SAAQ,cAAc;IAC7C,SAAS,CAAC,OAAO,SAAO;;IAMxB,OAAO,IAAI,UAAU;IAIrB,QAAQ,IAAI,WAAW;IAIvB,OAAO,IAAI,IAAI;IAIf,SAAS,CAAC,cAAc,IAAI,IAAI;CAUjC"}

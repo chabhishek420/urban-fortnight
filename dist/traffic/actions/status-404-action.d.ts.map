@@ -1,0 +1,1 @@
+{"version":3,"file":"status-404-action.d.ts","sourceRoot":"","sources":["../../../src/traffic/actions/status-404-action.ts"],"names":[],"mappings":"AAAA;;;;;;GAMG;AAEH,OAAO,EAAE,cAAc,EAAE,UAAU,EAAE,WAAW,EAAE,MAAM,mBAAmB,CAAC;AAG5E,qBAAa,eAAgB,SAAQ,cAAc;IACjD,SAAS,CAAC,OAAO,SAAQ;;IAMzB,OAAO,IAAI,UAAU;IAIrB,QAAQ,IAAI,WAAW;IAIvB,OAAO,IAAI,IAAI;CAYhB"}

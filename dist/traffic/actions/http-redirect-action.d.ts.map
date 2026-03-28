@@ -1,0 +1,1 @@
+{"version":3,"file":"http-redirect-action.d.ts","sourceRoot":"","sources":["../../../src/traffic/actions/http-redirect-action.ts"],"names":[],"mappings":"AAAA;;;;;;GAMG;AAEH,OAAO,EAAE,cAAc,EAAE,UAAU,EAAE,WAAW,EAAE,MAAM,mBAAmB,CAAC;AAG5E,qBAAa,kBAAmB,SAAQ,cAAc;IACpD,SAAS,CAAC,OAAO,SAAK;;IAMtB,OAAO,IAAI,UAAU;IAIrB,QAAQ,IAAI,WAAW;IAIvB,OAAO,IAAI,IAAI;CAoBhB"}

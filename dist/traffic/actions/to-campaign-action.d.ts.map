@@ -1,0 +1,1 @@
+{"version":3,"file":"to-campaign-action.d.ts","sourceRoot":"","sources":["../../../src/traffic/actions/to-campaign-action.ts"],"names":[],"mappings":"AAAA;;;;;;GAMG;AAEH,OAAO,EAAE,cAAc,EAAE,UAAU,EAAE,WAAW,EAAE,MAAM,mBAAmB,CAAC;AAE5E,qBAAa,gBAAiB,SAAQ,cAAc;IAClD,SAAS,CAAC,OAAO,SAAK;;IAMtB,OAAO,IAAI,UAAU;IAIrB,QAAQ,IAAI,WAAW;IAIvB,OAAO,IAAI,IAAI;CAchB"}
